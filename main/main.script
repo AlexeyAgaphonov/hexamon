@@ -1,0 +1,59 @@
+local hexamon = require("modules.hexamon")
+
+
+local HexFactory = "/main#factory_cell"
+
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	local W = 142 / 2
+	local H = 124 / 2
+	local size = vmath.vector3(W/2, H/math.sqrt(3), 0)
+	local origin = vmath.vector3(475, 300, 0)
+	self.layout = hexamon.new_layout_flat(size, origin)
+	self.borders = hexamon.new_borders(-10, 10, -10, 10)
+	self.cells = {}
+	self.border_offset = hexamon.offset_by_border(self.borders)
+
+	self.prev_hex = nil
+end
+
+function final(self)
+end
+
+function update(self, dt)
+end
+
+function fixed_update(self, dt)
+end
+
+function on_message(self, message_id, message, sender)
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and not action.released then
+		local hex = hexamon.pixel_to_hex(self.layout, vmath.vector3(action.x, action.y, 0))
+		hex = hexamon.round(hex)
+		if hex == self.prev_hex then
+			return
+		end
+		self.prev_hex = hex
+		local hkey = hexamon.cantor_encode(hex, self.border_offset)
+		local cell = self.cells[hkey]
+		if cell then
+			go.delete(cell)
+			self.cells[hkey] = nil
+		else
+			local pos = hexamon.hex_to_pixel(self.layout, hex)
+			local new_cell = factory.create(HexFactory, pos)
+			local l = tostring(hex.q) .. ", " .. tostring(hex.r)
+			local url = msg.url(nil, new_cell, "label")
+			label.set_text(url, l)
+			self.cells[hkey] = new_cell
+		end
+	end
+end
+
+function on_reload(self)
+end
