@@ -88,8 +88,18 @@ function M.new_hex(q, r, s)
     return Hex:new(q, r, s)
 end
 
+---@param f0 number
+---@param f1 number
+---@param f2 number
+---@param f3 number
+---@param b0 number
+---@param b1 number
+---@param b2 number
+---@param b3 number
+---@param start_angle number
 ---@return Hexamon.Orientation
 function M.new_orientation(f0, f1, f2, f3, b0, b1, b2, b3, start_angle)
+    ---@type Hexamon.Orientation
     return {
         f0 = f0,
         f1 = f1,
@@ -119,6 +129,8 @@ function M.new_orientation_flat()
     )
 end
 
+---@param orientation Hexamon.Orientation
+---@param size vector3
 ---@return Hexamon.Layout
 function M.new_layout(orientation, size, origin)
     local obj = {
@@ -272,6 +284,8 @@ function M.cantor_decode(z, offset)
     return M.new_hex(x - offset, y - offset)
 end
 
+---@param border Hexamon.Borders
+---@param callback fun(q: number, r: number)
 function M.foreach_hex_in_borders_flat(border, callback)
     local left = border.left
     local right = border.right
